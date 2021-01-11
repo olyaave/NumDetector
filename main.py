@@ -56,9 +56,9 @@ def main():
 
                 bot.delete_message(last_chat_id, last_message_id)
 
-                time.sleep(10)
+                time.sleep(5)
                 result = bot.send_message(last_chat_id, result_text)
-                time.sleep(10)
+                time.sleep(5)
                 if result != -1:
                     new_offset = last_update_id + 1
 
