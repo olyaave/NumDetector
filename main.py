@@ -18,48 +18,49 @@ def main():
     new_offset = None
 
     while True:
-
         last_update = bot.get_last_update(new_offset)
+        if last_update is not None and 'message' in last_update:
+            # Проверка на отправителя сообщения
+            if last_update['message']['from']['username'] != 'GroupAnonymousBot' and last_update['message']['from']['username'] != 'glossy_pink_pony' :
+                new_offset = last_update['update_id'] + 1
 
-        if last_update is not None and 'username' in last_update['message']['from'] and last_update['message']['from'][
-            'username'] == 'GroupAnonymousBot' and \
-                (('user' in last_update['message']['entities'][0] and
-                  last_update['message']['entities'][0]['user']['username'] == 'NumDetector_bot') or
-                 ('user' in last_update['message']['entities'][1] and
-                  last_update['message']['entities'][1]['user']['username'] == 'NumDetector_bot')):
-            bot.delete_message(last_update['message']['chat']['id'], last_update['message']['message_id'])
+            elif 'username' in last_update['message']['from'] and last_update['message']['from']['username'] == 'GroupAnonymousBot' and \
+                    (find_entity_user(last_update['message']['entities']) and
+                     find_entity_user(last_update['message']['entities'])['user']['username'] == 'NumDetector_bot'):
+                # bot.delete_message(last_update['message']['chat']['id'], last_update['message']['message_id'])
+                new_offset = last_update['update_id'] + 1
 
-        elif last_update is not None:
-            last_update_id = last_update['update_id']
-            message = 'message' if ('message' in last_update) else 'edited_message'
-            last_chat_text = last_update[message]['text']
-            last_chat_id = last_update[message]['chat']['id']
-            last_message_id = last_update[message]['message_id']
-            entities = last_update[message]['entities']
-            phone_numbers = get_number(last_chat_text)
-
-            if len(phone_numbers) != 0:
-
-                text_carrier_rate = numb_api.get_text_rate(phone_numbers[0])
-
-                response = tgph_api.create_page(phone_numbers[0].format() + " • " + text_carrier_rate[1],
-                                                html_content=text_carrier_rate[0])
-                rate_text = "[Рейтинг " + text_carrier_rate[2][0] + "," + text_carrier_rate[2][2:3] + "](" + \
-                            'https://telegra.ph/{}'.format(response['path']) + ")"
             else:
-                rate_text = 'Рейтинг -'
+                last_update_id = last_update['update_id']
+                message = 'message' if ('message' in last_update) else 'edited_message'
+                last_chat_text = last_update[message]['text']
+                last_chat_id = last_update[message]['chat']['id']
+                last_message_id = last_update[message]['message_id']
+                entities = last_update[message]['entities']
+                phone_numbers = get_number(last_chat_text)
 
-            result_text = pretty_text_result(last_chat_text, rate_text, entities)
+                if len(phone_numbers) != 0:
 
-            print(result_text)
+                    text_carrier_rate = numb_api.get_text_rate(phone_numbers[0])
 
-            bot.delete_message(last_chat_id, last_message_id)
+                    response = tgph_api.create_page(phone_numbers[0].format() + " • " + text_carrier_rate[1],
+                                                    html_content=text_carrier_rate[0])
+                    rate_text = "[Рейтинг " + text_carrier_rate[2][0] + "," + text_carrier_rate[2][2:3] + "](" + \
+                                'https://telegra.ph/{}'.format(response['path']) + ")"
+                else:
+                    rate_text = 'Рейтинг \\-'
 
-            time.sleep(10)
-            result = bot.send_message(last_chat_id, result_text)
-            time.sleep(10)
-            if result != -1:
-                new_offset = last_update_id + 1
+                result_text = pretty_text_result(last_chat_text, rate_text, entities)
+
+                print(result_text)
+
+                bot.delete_message(last_chat_id, last_message_id)
+
+                time.sleep(10)
+                result = bot.send_message(last_chat_id, result_text)
+                time.sleep(10)
+                if result != -1:
+                    new_offset = last_update_id + 1
 
 
 def find_entity_user(entities):
@@ -90,7 +91,7 @@ def find_author(text):
 def pretty_text_result(old_text, rate_text, entities):
     raw_text = old_text[: find_author(old_text)]
     raw_text = replace_all(raw_text, [r'_', r'*', r'[', ']', r'(', ')', r'~', r'`', r'>',
-                                  r'#', r'+', r'-', r'=', r'|', r'{', r'}', r'.', r'!'])
+                                      r'#', r'+', r'-', r'=', r'|', r'{', r'}', r'.', r'!'])
     raw_text += rate_text + "\n"
     user_entity = find_entity_user(entities)
     if user_entity:

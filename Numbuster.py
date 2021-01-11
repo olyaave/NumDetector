@@ -1,5 +1,3 @@
-import math
-
 import requests
 import signatures
 

@@ -16,8 +16,7 @@ class NumDetector:
         elif resp_json['error_code'] == 429:
             counter = 3
             while counter > 0 or resp_json['ok'] == False:
-                # time.sleep(resp_json['parameters']['retry_after'] + 10)
-                # time.sleep(10)
+                time.sleep(resp_json['parameters']['retry_after'] + 10)
                 print(resp_json['parameters']['retry_after'] + 10)
                 resp_json = requests.get(self.api_url + method, params).json()
                 print(resp_json)
