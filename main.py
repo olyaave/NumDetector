@@ -27,8 +27,8 @@ def main():
             elif 'username' in last_update['message']['from'] and last_update['message']['from']['username'] == 'GroupAnonymousBot' and \
                     (find_entity_user(last_update['message']['entities']) and
                      find_entity_user(last_update['message']['entities'])['user']['username'] == 'NumDetector_bot'):
-                # bot.delete_message(last_update['message']['chat']['id'], last_update['message']['message_id'])
-                new_offset = last_update['update_id'] + 1
+                bot.delete_message(last_update['message']['chat']['id'], last_update['message']['message_id'])
+                # new_offset = last_update['update_id'] + 1
 
             else:
                 last_update_id = last_update['update_id']
