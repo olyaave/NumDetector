@@ -9,7 +9,7 @@ class NumDetector:
 
     def make_request(self, method, **params):
         resp_json = requests.get(self.api_url + method, params).json()
-        print(resp_json)
+        # print(resp_json)
         if resp_json['ok']:
             result_json = resp_json['result']
             return result_json

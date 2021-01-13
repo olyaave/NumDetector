@@ -21,14 +21,14 @@ def main():
         last_update = bot.get_last_update(new_offset)
         if last_update is not None and 'message' in last_update:
             # Проверка на отправителя сообщения
-            if last_update['message']['from']['username'] != 'GroupAnonymousBot' and last_update['message']['from']['username'] != 'glossy_pink_pony' :
+            print(last_update)
+            if last_update['message']['from']['username'] != 'GroupAnonymousBot' and last_update['message']['from']['username'] != 'glossy_pink_pony':
                 new_offset = last_update['update_id'] + 1
 
-            elif 'username' in last_update['message']['from'] and last_update['message']['from']['username'] == 'GroupAnonymousBot' and \
-                    (find_entity_user(last_update['message']['entities']) and
-                     find_entity_user(last_update['message']['entities'])['user']['username'] == 'NumDetector_bot'):
-                bot.delete_message(last_update['message']['chat']['id'], last_update['message']['message_id'])
-                # new_offset = last_update['update_id'] + 1
+            # elif 'username' in last_update['message']['from'] and last_update['message']['from']['username'] == 'GroupAnonymousBot' and \
+            #         (find_entity_user(last_update['message']['entities']) and
+            #          ['username'] in find_entity_user(last_update['message']['entities'])['user'] and find_entity_user(last_update['message']['entities'])['user']['username'] == 'NumDetector_bot'):
+            #     bot.delete_message(last_update['message']['chat']['id'], last_update['message']['message_id'])
 
             else:
                 last_update_id = last_update['update_id']
@@ -45,14 +45,12 @@ def main():
 
                     response = tgph_api.create_page(phone_numbers[0].format() + " • " + text_carrier_rate[1],
                                                     html_content=text_carrier_rate[0])
-                    rate_text = "[Рейтинг " + text_carrier_rate[2][0] + "," + text_carrier_rate[2][2:3] + "](" + \
+                    rate_text = "[Рейтинг " + text_carrier_rate[2][0] + "," + text_carrier_rate[2][2:] + "](" + \
                                 'https://telegra.ph/{}'.format(response['path']) + ")"
                 else:
                     rate_text = 'Рейтинг \\-'
 
                 result_text = pretty_text_result(last_chat_text, rate_text, entities)
-
-                print(result_text)
 
                 bot.delete_message(last_chat_id, last_message_id)
 
@@ -105,7 +103,7 @@ def pretty_text_result(old_text, rate_text, entities):
     else:
         raw_text += "Канал\n"
 
-    print(raw_text)
+    # print(raw_text)
     return raw_text
 
 
