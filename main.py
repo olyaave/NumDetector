@@ -22,22 +22,17 @@ numbaster = Numbuster(nb_token)
 telegraph = Telegraph(tgph_token)
 
 
+
 def main():
     new_offset = None
 
     while True:
         last_update = bot.get_last_update(new_offset)
         if last_update is not None and 'message' in last_update:
-            # Проверка на отправителя сообщения
             print(last_update)
             if last_update['message']['from']['username'] != 'GroupAnonymousBot' and last_update['message']['from'][
                 'username'] != 'glossy_pink_pony':
                 new_offset = last_update['update_id'] + 1
-
-            # elif 'username' in last_update['message']['from'] and last_update['message']['from']['username'] == 'GroupAnonymousBot' and \
-            #         (find_entity_user(last_update['message']['entities']) and
-            #          ['username'] in find_entity_user(last_update['message']['entities'])['user'] and find_entity_user(last_update['message']['entities'])['user']['username'] == 'NumDetector_bot'):
-            #     bot.delete_message(last_update['message']['chat']['id'], last_update['message']['message_id'])
 
             else:
                 last_update_id = last_update['update_id']
@@ -59,9 +54,9 @@ def main():
 
                 result_text = pretty_text_telegram(last_chat_text, rate_text, entities)
                 # if len(phone_numbers) > 0:
-                    # amocrm.create_contact_and_lead(phone_numbers[0], result_text)
+                # amocrm.create_contact_and_lead(phone_numbers[0], result_text)
                 # else:
-                    # amocrm.create_contact_and_lead(None, result_text)
+                # amocrm.create_contact_and_lead(None, result_text)
 
                 bot.delete_message(last_chat_id, last_message_id)
 
@@ -72,51 +67,34 @@ def main():
                     new_offset = last_update_id + 1
 
 
-def find_entity_user(entities):
+def find_entity(entities, key):
     for entity in entities:
-        if 'user' in entity:
+        if key in entity:
             print(entity)
             return entity
     return None
 
 
-def find_entity_url(entities):
-    for entity in entities:
-        if 'url' in entity:
-            return entity
-    return None
-
-
-def find_entity_phone(entities):
-    for entity in entities:
-        if 'phone_number' in entity:
-            return entity
-    return None
-
-
-def find_author(text):
-    return str(text).rfind('Автор')
-
-
 def pretty_text_telegram(old_text, rate_text, entities):
-    raw_text = old_text[: find_author(old_text)]
-    raw_text = replace_all(raw_text, [r'_', r'*', r'[', ']', r'(', ')', r'~', r'`', r'>',
-                                      r'#', r'+', r'-', r'=', r'|', r'{', r'}', r'.', r'!'])
+    raw_text = replace_all(old_text[: find_author(old_text)], [r'_', r'*', r'[', ']', r'(', ')', r'~', r'`', r'>',
+                                                               r'#', r'+', r'-', r'=', r'|', r'{', r'}', r'.', r'!'])
     raw_text += rate_text + "\n"
-    user_entity = find_entity_user(entities)
+    user_entity = find_entity(entities, 'user')
     if user_entity:
         raw_text += "[Автор](tg://user?id=" + str(user_entity['user']['id']) + ")\n"
     else:
         raw_text += "Автор\n"
 
-    url_entity = find_entity_url(entities)
+    url_entity = find_entity(entities, 'url')
     if url_entity:
         raw_text += "[Канал](" + str(url_entity['url']) + ")"
     else:
         raw_text += "Канал\n"
-
-    # print(raw_text)
     return raw_text
+
+
+def find_author(text):
+    return str(text).rfind('Автор')
 
 
 def replace_all(text: str, characters):
