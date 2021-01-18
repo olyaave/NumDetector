@@ -38,7 +38,7 @@ class Numbuster:
         text_carrier_rate = [text, str(resp_json['carrier']), str(resp_json['index'])]
         return text_carrier_rate
 
-    def get_text_rate(self, phone):
+    def get_text_for_telegraph(self, phone):
         response = self._v6_old_phone(phone)
         text_and_rate = self.pretty_json(response)
         return text_and_rate

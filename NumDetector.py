@@ -9,7 +9,7 @@ class NumDetector:
 
     def make_request(self, method, **params):
         resp_json = requests.get(self.api_url + method, params).json()
-        # print(resp_json)
+        print(resp_json)
         if resp_json['ok']:
             result_json = resp_json['result']
             return result_json
@@ -41,8 +41,10 @@ class NumDetector:
         params = {'chat_id': chat_id, 'message_id': message_id}
         return self.make_request('deleteMessage', **params)
 
+
     def get_last_update(self, offset):
         get_result = self.get_updates(offset)
         if get_result != -1 and len(get_result) > 0:
             last_update = get_result[len(get_result) - 1]
             return last_update
+
