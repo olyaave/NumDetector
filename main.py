@@ -6,6 +6,8 @@ from NumDetector import NumDetector
 from Numbuster import Numbuster
 from telegraph import Telegraph
 
+from Textmaker import Textmaker
+
 telegram_token = "1564102967:AAFglz5bImv28kqjdfhzGzl8AUUK7Emt3TQ"
 nb_token = "p6Xu1TGJseMaS1EUj8lF6HK1go4mluzjPUma05YTVypaISE8pV"
 tgph_token = "ae8e2911eeaa9cb6b1e32d5bd154bb758fb131999070809c72a34c399d60"
@@ -20,7 +22,7 @@ amocrm = amoCRM(client_id="55ad718d-9e8a-4f73-b00b-2c2cd01c4a7e",
 bot = NumDetector(telegram_token)
 numbaster = Numbuster(nb_token)
 telegraph = Telegraph(tgph_token)
-
+textmaker = Textmaker()
 
 
 def main():
@@ -52,7 +54,7 @@ def main():
                 else:
                     rate_text = 'Рейтинг \\-'
 
-                result_text = pretty_text_telegram(last_chat_text, rate_text, entities)
+                result_text = textmaker.pretty_text_telegram(last_chat_text, rate_text, entities)
                 # if len(phone_numbers) > 0:
                 # amocrm.create_contact_and_lead(phone_numbers[0], result_text)
                 # else:
@@ -65,42 +67,6 @@ def main():
                 time.sleep(5)
                 if result != -1:
                     new_offset = last_update_id + 1
-
-
-def find_entity(entities, key):
-    for entity in entities:
-        if key in entity:
-            print(entity)
-            return entity
-    return None
-
-
-def pretty_text_telegram(old_text, rate_text, entities):
-    raw_text = replace_all(old_text[: find_author(old_text)], [r'_', r'*', r'[', ']', r'(', ')', r'~', r'`', r'>',
-                                                               r'#', r'+', r'-', r'=', r'|', r'{', r'}', r'.', r'!'])
-    raw_text += rate_text + "\n"
-    user_entity = find_entity(entities, 'user')
-    if user_entity:
-        raw_text += "[Автор](tg://user?id=" + str(user_entity['user']['id']) + ")\n"
-    else:
-        raw_text += "Автор\n"
-
-    url_entity = find_entity(entities, 'url')
-    if url_entity:
-        raw_text += "[Канал](" + str(url_entity['url']) + ")"
-    else:
-        raw_text += "Канал\n"
-    return raw_text
-
-
-def find_author(text):
-    return str(text).rfind('Автор')
-
-
-def replace_all(text: str, characters):
-    for character in characters:
-        text = text.replace(character, '\\' + character)
-    return text
 
 
 def get_number(text):
