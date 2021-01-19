@@ -30,7 +30,7 @@ class NumDetector:
         return self.make_request('getUpdates', **params)
 
     def send_message(self, chat_id, text, parse_mode='MarkdownV2'):
-        params = {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode}
+        params = {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode, 'disable_web_page_preview': True}
         return self.make_request('sendMessage', **params)
 
     def edit_message(self, chat_id, message_id, text):

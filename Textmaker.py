@@ -1,22 +1,44 @@
 class Textmaker:
 
-    def pretty_text_telegram(self, old_text, rate_text, entities):
-        raw_text = self.replace_all(old_text[: self.find_author(old_text)], [r'_', r'*', r'[', ']', r'(', ')', r'~',
+    def get_text_for_telegram(self, old_text, rate_text, entities):
+        text = self.replace_all(old_text[: self.find_author(old_text)], [r'_', r'*', r'[', ']', r'(', ')', r'~',
                                                                              r'`', r'>', r'#', r'+', r'-', r'=', r'|',
                                                                              r'{', r'}', r'.', r'!'])
-        raw_text += rate_text + "\n"
+        text += rate_text + "\n"
         user_entity = self.find_entity(entities, 'user')
         if user_entity:
-            raw_text += "[Автор](tg://user?id=" + str(user_entity['user']['id']) + ")\n"
+            text += "[Автор](tg://user?id=" + str(user_entity['user']['id']) + ")\n"
         else:
-            raw_text += "Автор\n"
+            text += "Автор\n"
 
+        text = self.add_url_line(entities, text)
+        return text
+
+    def get_text_for_amocrm(self, old_text, rate_text, entities):
+        text = old_text[: self.find_author(old_text)] + rate_text + "\n"
+        user_entity = self.find_entity(entities, 'user')
+        if user_entity and 'username' in user_entity['user']:
+            text += "[Автор](https://t.me/" + str(user_entity['user']['username']) + ")\n"
+        else:
+            text += "Автор\n"
+
+        text = self.add_url_line(entities, text)
+        return text
+
+    def add_url_line(self, entities, text):
         url_entity = self.find_entity(entities, 'url')
         if url_entity:
-            raw_text += "[Канал](" + str(url_entity['url']) + ")"
+            text += "[Канал](" + str(url_entity['url']) + ")"
         else:
-            raw_text += "Канал\n"
-        return raw_text
+            text += "Канал\n"
+        return text
+
+    @staticmethod
+    def get_rate_line(rate=None, path=None):
+        if rate is None:
+            return 'Рейтинг'
+        else:
+            return "[Рейтинг " + rate[0] + "," + rate[2:] + "](" + "https://telegra.ph/{}".format(path) + ")"
 
     @staticmethod
     def find_author(text):
@@ -32,6 +54,6 @@ class Textmaker:
     def find_entity(entities, key):
         for entity in entities:
             if key in entity:
-                print(entity)
                 return entity
         return None
+

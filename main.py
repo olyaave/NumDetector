@@ -12,12 +12,10 @@ telegram_token = "1564102967:AAFglz5bImv28kqjdfhzGzl8AUUK7Emt3TQ"
 nb_token = "p6Xu1TGJseMaS1EUj8lF6HK1go4mluzjPUma05YTVypaISE8pV"
 tgph_token = "ae8e2911eeaa9cb6b1e32d5bd154bb758fb131999070809c72a34c399d60"
 
-amocrm = amoCRM(client_id="55ad718d-9e8a-4f73-b00b-2c2cd01c4a7e",
-                secret="zo43cack3wPDLM2EFx7zrAsyC61ly5QRyEQPQvCE3BxuSWiZOfLCAyloaZ3FKiNi",
-                code="def5020076bbef283a2ced75ae8aad00528409f7bd5fc13fdeb8457f2922d501696e58eea6b31985db930674828efeb539b71121976132c7733cde39a7935c5bcbf497e965ad2b635630b93961e99ec085ec37d6c0896b8dd0fad891a697357f179cf50449b979d1bd3f5fbaf535b0b7d265b4848b9cf016cc3378f5e751785851fbd7248f5bc86d2cebed3ea691946f6058abda806e20f4d7d26905ad9a7e86148eff1d6201b7ddd77488533e7462f2871d10fa907284a17d74d7036a41aec69563487acd4ba9f4be43c484cf648b6b4c170ef3423983db6cbb100ca407b03212fceb4b1c04632d6865d991d5d22c849dd849f9100a08d23759ffebb23ed03cff3bf6d601aaa5464753fd4a77ee7b1f7e3e146d29f4fe3623a10e0ae7a0deb50aae432cb1c889a6e0968c58bac32a025b3248c3106938c8f9bc931ff5b4c043567262efe9c46152c2b290cc439899a1ae814de081c6004a1aedd1762c18ea4ac07bfec11fcbc32a99d7e1fc7fc254c76ea1e67217727dd020394b0865dde1e16f4c483f47a9e42b19aede0fd4a462ac60f43f4bf1ece0654d3133716550fac9f908401d8d8411937215594c29a7b44f7ea2a441d810dc3e06acfa71c152b92ff8977105f6bb28ca9a6bc1d98e82adc2df46b3f82a35e3257421",
-                username="averinaos")
-# amocrm.get_first_access_token()
-
+amocrm = amoCRM(client_id="efc03ed1-c1b2-46a7-8af7-22159866ba3a",
+                secret="sMTD3vyRDJuC1RLWuQpA9eaUuDIe2MPVcWKNXtWUDPP7ZhiHnHG7gjqT89cNWScA",
+                code="def502008efbf9e9330d964c8108736fe96f26ae6b407f2174cd0b3efbd6306b4a92c3022bbbd6a627ad7ec50071d7b89084aaa9c1fa75cea8797d6c3032adf2d13d1358e47275fdf4bff1101ee8b0ee1f017f33a80e27a797a0bb54c174384bfcf7aed5fbdf064fbb4b8a86d8c0d815f11214b1c4c29e30f361838a5de1402de2d640c8f747ad53c5cf09063eaa01a0aa820f79a961fdcb060d4d56f64def9ace2de403cadf81286fc46b154b836a5bda3b2152f1eac54d592d4bd70d92731c31747d3426f14dacec7a50b033f2a95d0965692ca7cc333577dc8ee0c0972c815b814598919d3f4a16b1c6e56d44c4cf317d551e02303e911a88901d20d0aff0466d9caee29a22ec9be1b19db45f25e1973f2475fcb896856f55a1c272aa1753c2a6165a555f79f8716c65f1f3d93fcbf04d3867d9e337b7657976b1a721edaa00772c1bafe9a99e8d50096278dc4b6d8005a73083447d1211a205f5980ad06eadc88ffa71dc40c5b908aa6693870e175983d6b53f4270f7ffe6fc6b4779b4eb010c99114341e1bbce138dc1bd1107f5f9d44f86c38f6ead362227837189b6008f8870a3eabde53d42d75a5c630320c818ecdb6d05030b12d1ad788011a2f77e696257091973067ddfd1e28eacc764b2c449a0ed1d5e6713e0be",
+                username="recoru")
 
 bot = NumDetector(telegram_token)
 numbaster = Numbuster(nb_token)
@@ -49,22 +47,21 @@ def main():
                     text_carrier_rate = numbaster.get_text_for_telegraph(phone_numbers[0])
                     response = telegraph.create_page(phone_numbers[0].format() + " • " + text_carrier_rate[1],
                                                      html_content=text_carrier_rate[0])
-                    rate_text = "[Рейтинг " + text_carrier_rate[2][0] + "," + text_carrier_rate[2][2:] + "](" + \
-                                'https://telegra.ph/{}'.format(response['path']) + ")"
+                    rate_line = textmaker.get_rate_line(text_carrier_rate[2], response['path'])
                 else:
-                    rate_text = 'Рейтинг \\-'
+                    rate_line = textmaker.get_rate_line()
 
-                result_text = textmaker.pretty_text_telegram(last_chat_text, rate_text, entities)
-                # if len(phone_numbers) > 0:
-                # amocrm.create_contact_and_lead(phone_numbers[0], result_text)
-                # else:
-                # amocrm.create_contact_and_lead(None, result_text)
-
+                text_for_telegram = textmaker.get_text_for_telegram(last_chat_text, rate_line, entities)
                 bot.delete_message(last_chat_id, last_message_id)
+                result = bot.send_message(last_chat_id, text_for_telegram)
 
-                time.sleep(5)
-                result = bot.send_message(last_chat_id, result_text)
-                time.sleep(5)
+                text_for_amocrm = textmaker.get_text_for_amocrm(last_chat_text, rate_line, entities)
+                if len(phone_numbers) > 0:
+                    amocrm.create_contact_and_lead(phone_numbers[0], text_for_amocrm)
+                else:
+                    amocrm.create_contact_and_lead(None, text_for_amocrm)
+
+                # time.sleep(5)
                 if result != -1:
                     new_offset = last_update_id + 1
 
