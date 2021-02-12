@@ -90,9 +90,9 @@ def get_number(text, entities):
             phone_number = '7' + phone_number[1:]
         return phone_number
 
-    phone_number = re.findall(r'(\+?7|8)[( -]{0,2}([\d]{3})[) -]{0,2}([\d]{2,3}[( -]{0,2}[\d]{2,3}[) -]{0,2}[\d]{2,3})', text)[0]
+    phone_number = re.findall(r'(\+?7|8)[( -]{0,2}([\d]{3})[) -]{0,2}([\d]{2,3}[( -]{0,2}[\d]{2,3}[) -]{0,2}[\d]{2,3})', text)
     if phone_number:
-        phone_number = ''.join(phone_number)
+        phone_number = ''.join(phone_number[0])
         phone_number = re.sub(r'[^0-9]', '', phone_number)
         if phone_number[0] == '8':
             phone_number = '7' + phone_number[1:]

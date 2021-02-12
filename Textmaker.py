@@ -47,8 +47,7 @@ class Textmaker:
         print(old_text)
         phone_entity = self.find_entity(entities, 'type')
         if phone_entity and phone_entity['type'] == 'phone_number':
-            old_text = re.sub(r'(\+?7|8)[( -]?([\d]{3})[) -]{0,2}?([\d]{2}[) -]?[\d]{2}[) -]?[\d]{3}|[\d]{3}'
-                                       r'[) -]?[\d]{2}[) -]?[\d]{2})', r'', old_text)
+            old_text = re.sub(r'(\+?7|8)[( -]{0,2}([\d]{3})[) -]{0,2}([\d]{2,3}[( -]{0,2}[\d]{2,3}[) -]{0,2}[\d]{2,3})', r'', old_text)
         text = old_text[: self.find_author(old_text)] + rate_text + "\n"
 
         text = self.add_user_line(entities, text)
