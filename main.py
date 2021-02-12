@@ -1,7 +1,10 @@
+import asyncio
 import re
 import time
 
-from AmoCRM import amoCRM
+from telethon import TelegramClient
+from telethon.tl.types import PeerUser
+from AmoCRM import AmoCRM
 from NumDetector import NumDetector
 from Numbuster import Numbuster
 from telegraph import Telegraph
@@ -9,18 +12,21 @@ from telegraph import Telegraph
 from Textmaker import Textmaker
 
 telegram_token = "1564102967:AAFglz5bImv28kqjdfhzGzl8AUUK7Emt3TQ"
-nb_token = "p6Xu1TGJseMaS1EUj8lF6HK1go4mluzjPUma05YTVypaISE8pV"
+nb_token = "JjgsIAHlzFGcyPJr0tCpWpnxkWUiv0B1JoOy87XvSnEv4bWJaR"
 tgph_token = "ae8e2911eeaa9cb6b1e32d5bd154bb758fb131999070809c72a34c399d60"
 
-amocrm = amoCRM(client_id="efc03ed1-c1b2-46a7-8af7-22159866ba3a",
-                secret="sMTD3vyRDJuC1RLWuQpA9eaUuDIe2MPVcWKNXtWUDPP7ZhiHnHG7gjqT89cNWScA",
-                code="def502008efbf9e9330d964c8108736fe96f26ae6b407f2174cd0b3efbd6306b4a92c3022bbbd6a627ad7ec50071d7b89084aaa9c1fa75cea8797d6c3032adf2d13d1358e47275fdf4bff1101ee8b0ee1f017f33a80e27a797a0bb54c174384bfcf7aed5fbdf064fbb4b8a86d8c0d815f11214b1c4c29e30f361838a5de1402de2d640c8f747ad53c5cf09063eaa01a0aa820f79a961fdcb060d4d56f64def9ace2de403cadf81286fc46b154b836a5bda3b2152f1eac54d592d4bd70d92731c31747d3426f14dacec7a50b033f2a95d0965692ca7cc333577dc8ee0c0972c815b814598919d3f4a16b1c6e56d44c4cf317d551e02303e911a88901d20d0aff0466d9caee29a22ec9be1b19db45f25e1973f2475fcb896856f55a1c272aa1753c2a6165a555f79f8716c65f1f3d93fcbf04d3867d9e337b7657976b1a721edaa00772c1bafe9a99e8d50096278dc4b6d8005a73083447d1211a205f5980ad06eadc88ffa71dc40c5b908aa6693870e175983d6b53f4270f7ffe6fc6b4779b4eb010c99114341e1bbce138dc1bd1107f5f9d44f86c38f6ead362227837189b6008f8870a3eabde53d42d75a5c630320c818ecdb6d05030b12d1ad788011a2f77e696257091973067ddfd1e28eacc764b2c449a0ed1d5e6713e0be",
+amocrm = AmoCRM(client_id="2d5141e3-aa54-4007-8c8a-b132f7711368",
+                secret="xVt5wbpkRBw4X5dOKbSYeudbGvlU2n5aeSOxDA72063wYfcJpmicjFpu4I6Y91vL",
+                code="def50200965e700ce541a4d9d38c12572ce795d62aaa9138491e08dd86a3953bc0b828a5ae01b605081e36c3a0d8f9e8c5e0ae51708f8f848c1e7c1a176debeb7f1c3053f6e1c24eb427786afc8913a50cc41c3ff4ff87b26baa1f964e9e91cff443d7baecaab112c4f11bd09c5aee90d1856a040e5f4cb05fc1dbb7e5dd74d3161ab7f784262c5ab2213bc9c5fe1e03913801bbb0305ac3f0c75c5a14c626ab97c36559e707e12e4df15d9527603b2c9341d2d7a4993c793a4de444a0f37ed377ca80a7a0d56d1a7afceb46d56676a842daf6e721c86b424132f40fa8645847ea8808a0859119d531e9371042188ff538b27b8e3ebb5cbf850b233fb83bd9d6d09aebcf2819ea26f4c34fbc0e62495608d49a48a027f45784999018b977768aae616dd502eb58932dd9f757ca53f63015015e08efea457e821d484a6f506a3015f0089135e5e14e565970929284638b11b822dae6896c09d464996719ecb08802cf53b59947b769407764e85cbe5c1a9a399aa42878b372c8d7a7f56e842fe7c43ec9f417960eb13782649b111afa42472a69750bfc6e4229c7ab3790e1284f1dce65caf474ac1a16cd39a59d0f3bae6edf30e1538563bdd367876b7130ad301d0f8f1717f398d80a5f5444795ce812590b76f423878777c998",
                 username="recoru")
 
 bot = NumDetector(telegram_token)
 numbaster = Numbuster(nb_token)
 telegraph = Telegraph(tgph_token)
-textmaker = Textmaker()
+api_id = 2181011
+api_hash = 'ae2924cd92241aaa3157218feb7032cf'
+client = TelegramClient('session_name', api_id, api_hash)
+textmaker = Textmaker(client)
 
 
 def main():
@@ -28,11 +34,14 @@ def main():
 
     while True:
         last_update = bot.get_last_update(new_offset)
+        amocrm.get_token()
+        # amocrm.get_first_access_token()
+
         if last_update is not None and 'message' in last_update:
-            print(last_update)
-            if last_update['message']['from']['username'] != 'GroupAnonymousBot' and last_update['message']['from'][
-                'username'] != 'glossy_pink_pony':
+            if 'text' not in last_update['message'] or len(re.findall('/start', last_update['message']['text'])) > 0:
                 new_offset = last_update['update_id'] + 1
+            # elif last_update['message']['from']['username'] == 'NumDetector_bot':
+            #     new_offset = last_update['update_id'] + 1
 
             else:
                 last_update_id = last_update['update_id']
@@ -41,11 +50,11 @@ def main():
                 last_chat_id = last_update[message]['chat']['id']
                 last_message_id = last_update[message]['message_id']
                 entities = last_update[message]['entities']
-                phone_numbers = get_number(last_chat_text)
+                phone_number = get_number(last_chat_text, entities)
 
-                if len(phone_numbers) != 0:
-                    text_carrier_rate = numbaster.get_text_for_telegraph(phone_numbers[0])
-                    response = telegraph.create_page(phone_numbers[0].format() + " • " + text_carrier_rate[1],
+                if phone_number:
+                    text_carrier_rate = numbaster.get_text_for_telegraph(phone_number)
+                    response = telegraph.create_page(phone_number.format() + " • " + text_carrier_rate[1],
                                                      html_content=text_carrier_rate[0])
                     rate_line = textmaker.get_rate_line(text_carrier_rate[2], response['path'])
                 else:
@@ -56,28 +65,39 @@ def main():
                 result = bot.send_message(last_chat_id, text_for_telegram)
 
                 text_for_amocrm = textmaker.get_text_for_amocrm(last_chat_text, rate_line, entities)
-                if len(phone_numbers) > 0:
-                    amocrm.create_contact_and_lead(phone_numbers[0], text_for_amocrm)
+
+                if phone_number:
+                    amocrm.create_contact_and_lead(phone_number, text_for_amocrm)
                 else:
                     amocrm.create_contact_and_lead(None, text_for_amocrm)
 
-                # time.sleep(5)
-                if result != -1:
-                    new_offset = last_update_id + 1
+                time.sleep(10)
+                # if result != -1:
+                new_offset = last_update_id + 1
 
 
-def get_number(text):
-    phone_numbers = re.findall(r'(\+?7|8)[( -]?([\d]{3})[) -]{0,2}?([\d]{2}[) -]?[\d]{2}[) -]?[\d]{3}|[\d]{3}'
-                               r'[) -]?[\d]{2}[) -]?[\d]{2})', text)
-    result_numbers = []
-    for i in range(len(phone_numbers)):
-        number = ''.join(phone_numbers[i])
-        number = re.sub(r'[^0-9]', '', number)
-        if number[0] == '8':
-            number = '7' + number[1:]
+def get_number(text, entities):
+    phone_entity = None
+    for entity in entities:
+        if 'type' in entity and entity['type'] == 'phone_number':
+            phone_entity = entity
 
-        result_numbers.append(number)
-    return result_numbers
+    if phone_entity:
+        phone_number = text[phone_entity['offset']:phone_entity['offset'] + phone_entity['length']]
+        phone_number = ''.join(phone_number)
+        phone_number = re.sub(r'[^0-9]', '', phone_number)
+        if phone_number[0] == '8':
+            phone_number = '7' + phone_number[1:]
+        return phone_number
+
+    phone_number = re.findall(r'(\+?7|8)[( -]{0,2}([\d]{3})[) -]{0,2}([\d]{2,3}[( -]{0,2}[\d]{2,3}[) -]{0,2}[\d]{2,3})', text)[0]
+    if phone_number:
+        phone_number = ''.join(phone_number)
+        phone_number = re.sub(r'[^0-9]', '', phone_number)
+        if phone_number[0] == '8':
+            phone_number = '7' + phone_number[1:]
+        return phone_number
+    return None
 
 
 if __name__ == '__main__':

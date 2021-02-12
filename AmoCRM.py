@@ -4,6 +4,7 @@ from datetime import datetime
 
 import requests
 
+#TODO сделать загрузку полей в конфиг перед публикацией на гите
 field_id_phone = 195595
 enum_id_phone = 266633
 
@@ -18,7 +19,7 @@ errors = {
 }
 
 
-class amoCRM:
+class AmoCRM:
     def __init__(self, client_id=None, secret=None, code=None, username=None):
         self.client_id = client_id
         self.secret = secret
@@ -31,7 +32,7 @@ class amoCRM:
 
     def make_request(self, method, method_url, headers=None, data={}):
         response = requests.request(method, self.url + method_url, headers=headers, json=data)
-        print(response.text)
+        # print(response.text)
         return response
 
     def get_first_access_token(self):
@@ -56,6 +57,7 @@ class amoCRM:
             "redirect_uri": self.redirect_url
         }
         response = self.make_request("post", "oauth2/access_token", {}, params)
+        print(response.text)
         if response.ok:
             return response.json()
         return None
@@ -68,7 +70,6 @@ class amoCRM:
                         'id': contact_id
                     }
                 ]}}]
-        # print(data)
         return self.make_request("post", "api/v4/leads", self.get_headers(), data)
 
     def create_contact(self, phone_number):
@@ -111,20 +112,28 @@ class amoCRM:
     def get_token(self):
         config = self.get_tokens_from_file()
         if config is not None:
-            print(int(datetime.timestamp(datetime.now())) - config['timestamp'])
-            print(config['expires_in'])
+            print("Сколько сек. назад был заменен токен: " + str(int(datetime.timestamp(datetime.now())) - config['timestamp']))
+            print("Время, которое он был годен: " + str(config['expires_in']) + '\n')
             if int(datetime.timestamp(datetime.now())) - config['timestamp'] < config['expires_in']:
+                print("Момент, когда токен еще не истек. \n")
                 self.refresh_token = config['refresh_token']
                 self.access_token = config['access_token']
                 return 0
+            elif 0 < config['expires_in'] - int(datetime.timestamp(datetime.now())) - config['timestamp'] < 400:
+                print("Момент, когда токен почти истек. \n")
+                self.access_token = config['access_token']
+                self.refresh_token = config['refresh_token']
+                self.set_tokens_in_file(config)
         config = self.get_access_token()
         if config is not None:
+            print("Момент, когда токен истек. \n")
             self.access_token = config['access_token']
             self.refresh_token = config['refresh_token']
             self.set_tokens_in_file(config)
             return 0
         config = self.get_first_access_token()
         if config is not None:
+            print("Момент, когда токена вообще нет. \n")
             self.access_token = config['access_token']
             self.refresh_token = config['refresh_token']
             self.set_tokens_in_file(config)
@@ -142,6 +151,8 @@ class amoCRM:
     def set_tokens_in_file(self, config):
         with open('config.txt', 'w') as file:
             config['timestamp'] = int(datetime.timestamp(datetime.now()))
+            config['date'] = datetime.strftime(datetime.now(), "%Y.%m.%d %H:%M:%S")
+
             file.write(json.dumps(config))
 
     def get_list_contacts_custom_fields(self):
