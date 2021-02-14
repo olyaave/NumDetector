@@ -1,5 +1,8 @@
+import json
+
 import requests
 import time
+
 
 
 class NumDetector:
@@ -30,7 +33,17 @@ class NumDetector:
         return self.make_request('getUpdates', **params)
 
     def send_message(self, chat_id, text, parse_mode='MarkdownV2'):
+
+        # keyboard = {
+        #     "inline_keyboard": [
+        #         [
+        #             {"text": "Рейтинг", "url": "http://www.google.com/"},
+        #             {"text": "Написать", "url": "http://www.google.com/"}
+        #         ]
+        #     ]
+        # };
         params = {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode, 'disable_web_page_preview': True}
+                  # 'reply_markup': json.dumps(keyboard)}
         return self.make_request('sendMessage', **params)
 
     def edit_message(self, chat_id, message_id, text):
@@ -40,7 +53,6 @@ class NumDetector:
     def delete_message(self, chat_id, message_id):
         params = {'chat_id': chat_id, 'message_id': message_id}
         return self.make_request('deleteMessage', **params)
-
 
     def get_last_update(self, offset):
         get_result = self.get_updates(offset)

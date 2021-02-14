@@ -63,6 +63,9 @@ class Textmaker:
                     self.get_user_link(user_entity['user']['id'], self.get_chat_name(entities)[13:]))
                 print(link)
                 text += "[Автор](" + link + ")\n"
+        elif user_entity and 'username' in user_entity['user']:
+            text += "[Автор](https://t.me/" + str(user_entity['user']['username']) + ")\n"
+
         else:
             text += "Автор\n"
         return text

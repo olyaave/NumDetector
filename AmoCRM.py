@@ -4,7 +4,6 @@ from datetime import datetime
 
 import requests
 
-#TODO сделать загрузку полей в конфиг перед публикацией на гите
 field_id_phone = 195595
 enum_id_phone = 266633
 
@@ -57,7 +56,7 @@ class AmoCRM:
             "redirect_uri": self.redirect_url
         }
         response = self.make_request("post", "oauth2/access_token", {}, params)
-        print(response.text)
+        print(response.status_code)
         if response.ok:
             return response.json()
         return None
@@ -107,26 +106,27 @@ class AmoCRM:
             resp = self.create_lead(contact_id=contact_id)
             lead_id = resp.json()["_embedded"]["leads"][0]["id"]
             self.create_note(lead_id, note)
-        return 0
+            return 0
+        return -1
 
     def get_token(self):
-        config = self.get_tokens_from_file()
-        if config is not None:
-            print("Сколько сек. назад был заменен токен: " + str(int(datetime.timestamp(datetime.now())) - config['timestamp']))
-            print("Время, которое он был годен: " + str(config['expires_in']) + '\n')
-            if int(datetime.timestamp(datetime.now())) - config['timestamp'] < config['expires_in']:
-                print("Момент, когда токен еще не истек. \n")
-                self.refresh_token = config['refresh_token']
-                self.access_token = config['access_token']
-                return 0
-            elif 0 < config['expires_in'] - int(datetime.timestamp(datetime.now())) - config['timestamp'] < 400:
-                print("Момент, когда токен почти истек. \n")
-                self.access_token = config['access_token']
-                self.refresh_token = config['refresh_token']
-                self.set_tokens_in_file(config)
+        # config = self.get_tokens_from_file()
+        # if config is not None:
+        #     print("Сколько сек. назад был заменен токен: " + str(int(datetime.timestamp(datetime.now())) - config['timestamp']))
+        #     print("Время, которое он был годен: " + str(config['expires_in']) + '\n')
+        #     if int(datetime.timestamp(datetime.now())) - config['timestamp'] < config['expires_in']:
+        #         print("Момент, когда токен еще не истек. \n")
+        #         self.refresh_token = config['refresh_token']
+        #         self.access_token = config['access_token']
+        #         return 0
+        #     elif 0 < config['expires_in'] - int(datetime.timestamp(datetime.now())) - config['timestamp'] < 400:
+        #         print("Момент, когда токен почти истек. \n")
+        #         self.access_token = config['access_token']
+        #         self.refresh_token = config['refresh_token']
+        #         self.set_tokens_in_file(config)
         config = self.get_access_token()
         if config is not None:
-            print("Момент, когда токен истек. \n")
+            # print("Момент, когда токен истек. \n")
             self.access_token = config['access_token']
             self.refresh_token = config['refresh_token']
             self.set_tokens_in_file(config)

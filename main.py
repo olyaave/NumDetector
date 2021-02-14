@@ -3,7 +3,6 @@ import re
 import time
 
 from telethon import TelegramClient
-from telethon.tl.types import PeerUser
 from AmoCRM import AmoCRM
 from NumDetector import NumDetector
 from Numbuster import Numbuster
@@ -15,9 +14,9 @@ telegram_token = "1564102967:AAFglz5bImv28kqjdfhzGzl8AUUK7Emt3TQ"
 nb_token = "JjgsIAHlzFGcyPJr0tCpWpnxkWUiv0B1JoOy87XvSnEv4bWJaR"
 tgph_token = "ae8e2911eeaa9cb6b1e32d5bd154bb758fb131999070809c72a34c399d60"
 
-amocrm = AmoCRM(client_id="2d5141e3-aa54-4007-8c8a-b132f7711368",
-                secret="xVt5wbpkRBw4X5dOKbSYeudbGvlU2n5aeSOxDA72063wYfcJpmicjFpu4I6Y91vL",
-                code="def50200965e700ce541a4d9d38c12572ce795d62aaa9138491e08dd86a3953bc0b828a5ae01b605081e36c3a0d8f9e8c5e0ae51708f8f848c1e7c1a176debeb7f1c3053f6e1c24eb427786afc8913a50cc41c3ff4ff87b26baa1f964e9e91cff443d7baecaab112c4f11bd09c5aee90d1856a040e5f4cb05fc1dbb7e5dd74d3161ab7f784262c5ab2213bc9c5fe1e03913801bbb0305ac3f0c75c5a14c626ab97c36559e707e12e4df15d9527603b2c9341d2d7a4993c793a4de444a0f37ed377ca80a7a0d56d1a7afceb46d56676a842daf6e721c86b424132f40fa8645847ea8808a0859119d531e9371042188ff538b27b8e3ebb5cbf850b233fb83bd9d6d09aebcf2819ea26f4c34fbc0e62495608d49a48a027f45784999018b977768aae616dd502eb58932dd9f757ca53f63015015e08efea457e821d484a6f506a3015f0089135e5e14e565970929284638b11b822dae6896c09d464996719ecb08802cf53b59947b769407764e85cbe5c1a9a399aa42878b372c8d7a7f56e842fe7c43ec9f417960eb13782649b111afa42472a69750bfc6e4229c7ab3790e1284f1dce65caf474ac1a16cd39a59d0f3bae6edf30e1538563bdd367876b7130ad301d0f8f1717f398d80a5f5444795ce812590b76f423878777c998",
+amocrm = AmoCRM(client_id="048231f3-172f-471f-874e-cd50e3f42db0",
+                secret="3NuQRwEzbr1H1JCe7YtwTgL5DVxWBD2TNqMc2VeXEz5fY6jRUeTj3oYdqecOcm7K",
+                code="def5020056fe97fed6f5c5cff4a9285ce01a65c8adec97b20f1ff49a4bb1ff3f9044f312b5e3996c27994941a980522da7b6c145d6ada3cb7d924488b6a69a4c86b716bec0fceeb2d8f78f6db3f579c893fc558f7333a289c66aa04677a261cfcbbb474a07c9286fa596e30cef2d620724ba732243951dc990c5f2a614081def6d7d77388eb0bd127674a5560d07c3cf3e1e9c9867244210e3de3c12d662def05dfc1b2e3aa6fa51c3998eeb357a75f3b13dc9aa77311df33870174a395bb7709e213d17e54cf0ec6393ceb46152aaef45b6e82e8269a0f6679073c312a26b9ce5f259c39e62bbbe78d3433bc3832ba1bf39b1ec837ea962fa75b817481ee7ea524d100b2c8749334e683ffbec9578eb355f71741797cf3d7e35d46765f213c2d58ce08fb1bb06ba4aa928d8aae89cb84d105abb1f69300af5ffdaf3af76842f8dc32783f99e0e914cb4aab5afaabe7854b50f67dc3fa9b8528f300f80dd6fb8dfdee4f8da24f9e1b1e6a153ed50252f96d74b4329bbe2df4521ec1c40c610a06274c5ab8f6720e694a4f6cf583dcc98bbd7db1cbcc7bc976577862bcc27d8c6bf3fb80718fc81d5cadbd9038567d713b8d2b3e3b645bd323022cd7ec01c4f817af9599df728b93f4b2d8a8784fdd7e65bf8922569179d1b8001",
                 username="recoru")
 
 bot = NumDetector(telegram_token)
@@ -33,12 +32,14 @@ def main():
     new_offset = None
 
     while True:
+
         last_update = bot.get_last_update(new_offset)
         amocrm.get_token()
         # amocrm.get_first_access_token()
+        # bot.delete_message(-1001213300671, 2474)
 
         if last_update is not None and 'message' in last_update:
-            if 'text' not in last_update['message'] or len(re.findall('/start', last_update['message']['text'])) > 0:
+            if 'text' not in last_update['message'] or len(re.findall('/start', last_update['message']['text'])) > 0 or 'entities' not in last_update['message']:
                 new_offset = last_update['update_id'] + 1
             # elif last_update['message']['from']['username'] == 'NumDetector_bot':
             #     new_offset = last_update['update_id'] + 1
@@ -60,37 +61,44 @@ def main():
                 else:
                     rate_line = textmaker.get_rate_line()
 
+                text_for_amocrm = textmaker.get_text_for_amocrm(last_chat_text, rate_line, entities)
+
+                if phone_number:
+                    result_lead = amocrm.create_contact_and_lead(phone_number, text_for_amocrm)
+                else:
+                    result_lead = amocrm.create_contact_and_lead(None, text_for_amocrm)
+
+                if result_lead == -1:
+                    continue
+
                 text_for_telegram = textmaker.get_text_for_telegram(last_chat_text, rate_line, entities)
                 bot.delete_message(last_chat_id, last_message_id)
                 result = bot.send_message(last_chat_id, text_for_telegram)
 
-                text_for_amocrm = textmaker.get_text_for_amocrm(last_chat_text, rate_line, entities)
-
-                if phone_number:
-                    amocrm.create_contact_and_lead(phone_number, text_for_amocrm)
-                else:
-                    amocrm.create_contact_and_lead(None, text_for_amocrm)
 
                 time.sleep(10)
-                # if result != -1:
-                new_offset = last_update_id + 1
+                if result != -1:
+                    new_offset = last_update_id + 1
 
 
 def get_number(text, entities):
     phone_entity = None
-    for entity in entities:
-        if 'type' in entity and entity['type'] == 'phone_number':
-            phone_entity = entity
+    # for entity in entities:
+    #     if 'type' in entity and entity['type'] == 'phone_number':
+    #         phone_entity = entity
 
-    if phone_entity:
-        phone_number = text[phone_entity['offset']:phone_entity['offset'] + phone_entity['length']]
-        phone_number = ''.join(phone_number)
-        phone_number = re.sub(r'[^0-9]', '', phone_number)
-        if phone_number[0] == '8':
-            phone_number = '7' + phone_number[1:]
-        return phone_number
+    # if phone_entity:
+    #     phone_number = text[phone_entity['offset']:phone_entity['offset'] + phone_entity['length']]
+    #     phone_number = ''.join(phone_number)
+    #     phone_number = re.sub(r'[^0-9]', '', phone_number)
+    #     if phone_number[0] == '8':
+    #         phone_number = '7' + phone_number[1:]
+    #     return phone_number
 
-    phone_number = re.findall(r'(\+?7|8)[( -]{0,2}([\d]{3})[) -]{0,2}([\d]{2,3}[( -]{0,2}[\d]{2,3}[) -]{0,2}[\d]{2,3})', text)
+    phone_number = re.findall(r'(\+?[\d][\d() -]{9,15})', text)
+    # phone_number = re.findall(r'((\+?7|\+?9|8)[( -]{
+    # 0,2}([\d]{3})[) -]{0,2}([\d]{2,3}[( -]{0,2}[\d]{2,3}[) -]{0,2}[\d]{2,3}))', text)
+
     if phone_number:
         phone_number = ''.join(phone_number[0])
         phone_number = re.sub(r'[^0-9]', '', phone_number)
