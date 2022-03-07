@@ -10,20 +10,20 @@ from telegraph import Telegraph
 
 from Textmaker import Textmaker
 
-telegram_token = "1564102967:AAFglz5bImv28kqjdfhzGzl8AUUK7Emt3TQ"
-nb_token = "JjgsIAHlzFGcyPJr0tCpWpnxkWUiv0B1JoOy87XvSnEv4bWJaR"
-tgph_token = "ae8e2911eeaa9cb6b1e32d5bd154bb758fb131999070809c72a34c399d60"
+telegram_token = ""
+nb_token = ""
+tgph_token = ""
 
-amocrm = AmoCRM(client_id="048231f3-172f-471f-874e-cd50e3f42db0",
-                secret="3NuQRwEzbr1H1JCe7YtwTgL5DVxWBD2TNqMc2VeXEz5fY6jRUeTj3oYdqecOcm7K",
-                code="def5020056fe97fed6f5c5cff4a9285ce01a65c8adec97b20f1ff49a4bb1ff3f9044f312b5e3996c27994941a980522da7b6c145d6ada3cb7d924488b6a69a4c86b716bec0fceeb2d8f78f6db3f579c893fc558f7333a289c66aa04677a261cfcbbb474a07c9286fa596e30cef2d620724ba732243951dc990c5f2a614081def6d7d77388eb0bd127674a5560d07c3cf3e1e9c9867244210e3de3c12d662def05dfc1b2e3aa6fa51c3998eeb357a75f3b13dc9aa77311df33870174a395bb7709e213d17e54cf0ec6393ceb46152aaef45b6e82e8269a0f6679073c312a26b9ce5f259c39e62bbbe78d3433bc3832ba1bf39b1ec837ea962fa75b817481ee7ea524d100b2c8749334e683ffbec9578eb355f71741797cf3d7e35d46765f213c2d58ce08fb1bb06ba4aa928d8aae89cb84d105abb1f69300af5ffdaf3af76842f8dc32783f99e0e914cb4aab5afaabe7854b50f67dc3fa9b8528f300f80dd6fb8dfdee4f8da24f9e1b1e6a153ed50252f96d74b4329bbe2df4521ec1c40c610a06274c5ab8f6720e694a4f6cf583dcc98bbd7db1cbcc7bc976577862bcc27d8c6bf3fb80718fc81d5cadbd9038567d713b8d2b3e3b645bd323022cd7ec01c4f817af9599df728b93f4b2d8a8784fdd7e65bf8922569179d1b8001",
-                username="recoru")
+amocrm = AmoCRM(client_id="",
+                secret="",
+                code="",
+                username="")
 
 bot = NumDetector(telegram_token)
 numbaster = Numbuster(nb_token)
 telegraph = Telegraph(tgph_token)
 api_id = 2181011
-api_hash = 'ae2924cd92241aaa3157218feb7032cf'
+api_hash = 'ae2924cd92241aaa3153218feb7032cf'
 client = TelegramClient('session_name', api_id, api_hash)
 textmaker = Textmaker(client)
 
